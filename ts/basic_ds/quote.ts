@@ -1,5 +1,3 @@
-namespace DS {
-    export class Quotation {
-        Name: string;
-    }
+export class Quotation {
+    Name: string;
 }
