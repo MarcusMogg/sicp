@@ -1,3 +1,4 @@
+import { DS } from "./bs"
 export class Rational {
     Numerator: number;
     Denominator: number;
@@ -92,7 +93,9 @@ export class Real {
     }
 }
 
-export class Complex {
+export class Complex implements DS {
+    static readonly Type = "Complex";
+    readonly Type = Complex.Type;
     RealPart: Real
     UnRealPart: Real
 

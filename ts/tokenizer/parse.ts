@@ -540,7 +540,7 @@ export function* Tokenizer(input: string) {
                 if (find(delimiter, cs)) {
                     state = DFAState.End;
                 } else if (idSubsequent(cs)) {
-                    token.Value += cs;
+                    (token as Token.TokenIdentifier).Value.Value += cs;
                     state = DFAState.IdInit;
                     next();
                 } else {

@@ -15,7 +15,7 @@
 ##  Token 解析
 
 ```cpp
-<token> ::= <identifieri> |  <boolean> | <number> 
+<token> ::= <identifier> |  <boolean> | <number> 
               | <character> | <string> | '(' | ')'
               | ',' | " ' " | '.' 
 
