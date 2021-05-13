@@ -1,4 +1,4 @@
-import { Datum } from "../expression/datum";
+import { DS } from "../basic_ds/bs";
 
 export interface Env {
     Get(key: string): any;
@@ -9,14 +9,14 @@ export interface Env {
 
 export class SimpleEnv implements Env {
     private parent_: SimpleEnv;
-    private map_: Map<string, Datum>
+    private map_: Map<string, DS>
 
     constructor() {
         this.map_ = new Map();
         this.parent_ = undefined;
     }
 
-    Get(key: string): Datum {
+    Get(key: string): DS {
         if (this.map_.has(key)) {
             return this.map_.get(key);
         }
@@ -24,7 +24,7 @@ export class SimpleEnv implements Env {
             undefined :
             this.parent_.Get(key);
     }
-    Set(key: string, vaule: Datum) {
+    Set(key: string, vaule: DS) {
         this.map_.set(key, vaule);
     }
     MakeChild(): SimpleEnv {

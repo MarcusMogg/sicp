@@ -45,7 +45,7 @@ export function parse(token: Generator<TT.TokenType, void, unknown>): DS {
                 next();
             }
         }
-        return Cons.MakeFromArray(a);
+        return Cons.List(...a);
     } else if (t.Type === TT.TokenBoolean.Type
         || t.Type === TT.TokenComplex.Type
         || t.Type === TT.TokenChar.Type

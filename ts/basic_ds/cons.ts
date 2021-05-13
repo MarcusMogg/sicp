@@ -44,13 +44,6 @@ export class Cons implements DS {
         return res;
     }
 
-    static MakeFromArray(a: Array<DS>, start = 0): Cons {
-        if (start >= a.length) {
-            return undefined;
-        }
-        return new Cons(a[start], Cons.MakeFromArray(a, start + 1));
-    }
-
     static List(...data: Array<DS>): Cons {
         if (data.length === 0) {
             return undefined;
