@@ -4,12 +4,16 @@ import { Identifier } from "./quote";
 export class Procedure implements DS {
     static readonly Type = "procedure";
     readonly Type = Procedure.Type;
-
-    parameters: Array<DS>;
-    body: DS;
+    DisplayStr() {
+        return "procedure";
+    }
+    primitive: boolean;
+    parameters: Array<Identifier>;
+    body: DS | ((x: Array<DS>) => DS);
     env: Env;
 
-    constructor(parameters: Array<DS>, body: DS, env: Env) {
+    constructor(primitive: boolean, parameters: Array<Identifier>, body: DS | ((x: Array<DS>) => DS), env: Env) {
+        this.primitive = primitive;
         this.parameters = parameters;
         this.body = body;
         this.env = env;

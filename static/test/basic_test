@@ -1,0 +1,13 @@
+(define a 3)
+(define (b x) (+ 1 x))
+(define c (lambda (x) (+ 1 x)))
+
+(b a)
+(c a)
+(+ 1 a)
+(+ 1 2)
+(+ 5 3 4)
+
+(define (d xx) (lambda (x) (+ xx x)))
+
+((d 1) a)

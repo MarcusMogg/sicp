@@ -33,7 +33,9 @@ export function Eval(exp: DS, env: Env): DS {
     } else if (Datum.letS(exp)) {
         return evalLet(((exp as Cons).cdr()), env);
     } else if (Datum.application(exp)) {
-
+        let op = Eval((exp as Cons).car(), env) as Procedure;
+        let vals = listOfValues((exp as Cons).cdr(), env)
+        return Apply(op, vals);
     } else {
         throw new Error("Unknown expression type");
     }
@@ -107,7 +109,7 @@ function evalIF(exp: DS, env: Env): DS {
     return undefined;
 }
 
-function evalSequence(exp: DS, env: Env): DS {
+export function evalSequence(exp: DS, env: Env): DS {
     if ((exp as Cons).cdr() === undefined) {
         return Eval((exp as Cons).car(), env);
     }
@@ -124,11 +126,11 @@ function makeIF(predicate: DS, consequent: DS, alternative: DS): Cons {
 }
 
 function makeLambda(params: Cons, body: Cons): Cons {
-    return Cons.List(new Identifier("lambda"), params, body);
+    return new Cons(new Identifier("lambda"), new Cons(params, body));
 }
 
 function makeProcedure(params: Cons, body: DS, env: Env): Procedure {
-    return new Procedure(params.toArray(), body, env);
+    return new Procedure(false, params.toArray() as Array<Identifier>, body, env);
 }
 
 function sequenceExp(exp: Cons) {
@@ -173,5 +175,13 @@ function evalLet(exp: DS, env: Env): DS {
         params = params.cdr() as Cons;
     }
     // FIXME：函数执行需要修改环境，应该相当于application
-    return Apply(Eval(makeLambda(Cons.List(...v), body), env), env);
+    return Apply(Eval(makeLambda(Cons.List(...v), body), env) as Procedure, params);
+}
+
+function listOfValues(exp: DS, env: Env): Cons {
+    if (exp === undefined) {
+        return undefined;
+    }
+    return new Cons(Eval((exp as Cons).car(), env),
+        listOfValues((exp as Cons).cdr(), env))
 }

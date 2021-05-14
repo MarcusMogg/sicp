@@ -8,6 +8,9 @@ export class Cons implements DS {
         this.first = f;
         this.second = s;
     }
+    DisplayStr() {
+        return "()";
+    }
     car() {
         return this.first;
     }

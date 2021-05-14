@@ -1,3 +1,4 @@
 export interface DS {
-    readonly Type: string
+    readonly Type: string;
+    DisplayStr(): string;
 }

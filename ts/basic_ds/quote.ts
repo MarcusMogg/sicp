@@ -3,6 +3,9 @@ export class Quotation implements DS {
     static readonly Type = "Quotation";
     readonly Type = Quotation.Type
     Value: any;
+    DisplayStr() {
+        return `'${this.Value}`;
+    }
 }
 
 export class Identifier implements DS {
@@ -11,5 +14,8 @@ export class Identifier implements DS {
     Value: string;
     constructor(v: string) {
         this.Value = v;
+    }
+    DisplayStr() {
+        return `${this.Value}`;
     }
 }

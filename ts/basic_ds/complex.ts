@@ -35,11 +35,19 @@ export class Rational {
         return this.Numerator / this.Denominator;
     }
     DisplayStr() {
-        if (this.Denominator === 1) {
+        if (this.Denominator === 1 || this.Numerator === 0) {
             return `${this.Numerator}`;
         } else {
             return `${this.Numerator}/${this.Denominator}`;
         }
+    }
+    plus(rhs: Rational) {
+        this.Numerator *= rhs.Denominator;
+        this.Numerator += rhs.Numerator * this.Denominator;
+        this.Denominator *= rhs.Denominator;
+        let g = gcd(this.Numerator, this.Denominator);
+        this.Denominator /= g;
+        this.Numerator /= g;
     }
 }
 
@@ -91,6 +99,26 @@ export class Real {
         }
         return false;
     }
+
+    toNumber(): number {
+        if (this.Value instanceof Rational) {
+            return this.Value.toNumber();
+        } else {
+            return this.Value;
+        }
+    }
+
+    plus(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                this.Value.plus(rhs.Value);
+            } else {
+                this.Value = this.Value.toNumber() + rhs.toNumber()
+            }
+        } else {
+            this.Value = this.Value + rhs.toNumber()
+        }
+    }
 }
 
 export class Complex implements DS {
@@ -98,7 +126,10 @@ export class Complex implements DS {
     readonly Type = Complex.Type;
     RealPart: Real
     UnRealPart: Real
-
+    constructor() {
+        this.RealPart = Real.MakeFromRational(Rational.MakeFromInteger(0, 1));
+        this.UnRealPart = Real.MakeFromRational(Rational.MakeFromInteger(0, 1));
+    }
     DisplayStr() {
         if (this.UnRealPart.Zero()) {
             return this.RealPart.DisplayStr();
@@ -106,6 +137,11 @@ export class Complex implements DS {
             let u = this.UnRealPart.DisplayStr();
             return `${this.RealPart.DisplayStr()}${u[0] === '-' ? u : `+${u}`}i`
         }
+    }
+
+    plus(rhs: Complex) {
+        this.RealPart.plus(rhs.RealPart);
+        this.UnRealPart.plus(rhs.UnRealPart);
     }
 }
 

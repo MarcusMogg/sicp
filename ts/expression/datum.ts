@@ -6,11 +6,15 @@ import { Identifier, Quotation } from "../basic_ds/quote";
 import { MyChar, MyString } from "../basic_ds/string";
 import * as TT from "../tokenizer/toke_type"
 
-export function parse(token: Generator<TT.TokenType, void, unknown>): DS {
+export function parse(token: Generator<TT.TokenType, void, unknown>, befor?: TT.TokenType): DS {
     let cur; let t: TT.TokenType;
-    cur = token.next();
-    if (cur.done) {
-        return undefined;
+    if (befor === undefined) {
+        cur = token.next();
+        if (cur.done) {
+            return undefined;
+        }
+    } else {
+        cur = befor;
     }
     t = cur.value as TT.TokenType;
     let next = () => {
@@ -26,23 +30,20 @@ export function parse(token: Generator<TT.TokenType, void, unknown>): DS {
         return tmp;
     } else if (t.Type === TT.TokenBracketsLeftRound.Type) {
         let a: Array<DS> = new Array();
-        next();
-        while (TT.TokenBracketsRightRound.Type !== t.Type) {
-            if (t.Type === TT.TokenDot.Type) {
-                if (a.length === 0) {
-                    throw new Error("Datum parse error: not enough datum before dot");
-                } else {
-                    a.push(new Identifier("."));
-                    next();
-                    a.push(parse(token))
-                    next();
-                    if (TT.TokenBracketsRightRound.Type !== t.Type) {
-                        throw new Error("Datum parse error: multiple datum before dot");
-                    }
+        while (true) {
+            next();
+            if (TT.TokenBracketsRightRound.Type === t.Type) {
+                break;
+            }
+            let tmp = parse(token, cur)
+            a.push(tmp);
+        }
+        for (let index = 0; index < a.length; index++) {
+            if (a[index].Type === Identifier.Type &&
+                (a[index] as Identifier).Value === ".") {
+                if (index === 0 || index !== a.length - 2) {
+                    throw new Error(" illegal use of `.`");
                 }
-            } else {
-                a.push(parse(token))
-                next();
             }
         }
         return Cons.List(...a);
@@ -53,6 +54,7 @@ export function parse(token: Generator<TT.TokenType, void, unknown>): DS {
         || t.Type === TT.TokenIdentifier.Type) {
         return t.Value;
     } else {
+        console.log(t);
         throw new Error("Datum parse error: unexpected token type");
     }
 }
