@@ -8,7 +8,7 @@ export class MyBool implements DS {
         this.Value = v;
     }
     DisplayStr() {
-        return `\\${this.Value ? "t" : "f"}`;
+        return `#${this.Value ? "t" : "f"}`;
     }
 
     static isTrue(exp: DS) {

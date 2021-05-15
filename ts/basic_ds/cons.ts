@@ -9,7 +9,20 @@ export class Cons implements DS {
         this.second = s;
     }
     DisplayStr() {
-        return "()";
+        let res = "(";
+        if (this.first !== undefined) {
+            res += this.first.DisplayStr();
+        }
+        if (this.second === undefined) {
+            res += ")";
+        }
+        else if (this.second instanceof Cons) {
+            // remove '(' for list
+            res += " " + this.second.DisplayStr().slice(1);
+        } else {
+            res += " " + this.second.DisplayStr() + ")";
+        }
+        return res;
     }
     car() {
         return this.first;

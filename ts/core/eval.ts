@@ -103,6 +103,7 @@ function evalIF(exp: DS, env: Env): DS {
     } else {
         let alter = ifAlternative(exp);
         if (alter !== undefined) {
+            //console.log(alter.DisplayStr())
             return Eval(alter, env);
         }
     }
@@ -115,7 +116,7 @@ export function evalSequence(exp: DS, env: Env): DS {
     }
     // FIXME: 这里的值是否要处理
     Eval((exp as Cons).car(), env);
-    return Eval((exp as Cons).cdr(), env)
+    return evalSequence((exp as Cons).cdr(), env)
 }
 
 function makeIF(predicate: DS, consequent: DS, alternative: DS): Cons {
@@ -156,7 +157,7 @@ function makeCond(exp: DS): DS {
         }
         return sequenceExp(first.cdr() as Cons);
     } else {
-        return makeIF(first.car(), first.cdr(), makeCond(rest))
+        return makeIF(first.car(), sequenceExp(first.cdr() as Cons), makeCond(rest))
     }
 }
 

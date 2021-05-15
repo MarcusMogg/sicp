@@ -1,3 +1,4 @@
+import { MyBool } from "../basic_ds/boolean";
 import { DS } from "../basic_ds/bs";
 import { Complex } from "../basic_ds/complex";
 import { Cons } from "../basic_ds/cons";
@@ -31,7 +32,7 @@ function extendEnv(env: Env, paramTemple: Array<Identifier>, value: Cons): Env {
         e.Set(element.Value, value.car());
         value = value.cdr() as Cons;
     }
-    if (paramTemple.length >= 2 && paramTemple[-2].Value === ".") {
+    if (paramTemple.length >= 2 && paramTemple[paramTemple.length - 2].Value === ".") {
         e.Set(paramTemple[-1].Value, value);
         value = undefined;
     }
@@ -40,7 +41,7 @@ function extendEnv(env: Env, paramTemple: Array<Identifier>, value: Cons): Env {
     }
     return e;
 }
-
+// +
 function plus() {
     let body = (x: Array<DS>): DS => {
         let res: Complex = new Complex();
@@ -51,9 +52,43 @@ function plus() {
     }
     return new Procedure(true, undefined, body, undefined);
 }
+// -
+function sub() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length < 1) {
+            throw new Error("- : expected at least 1 argument");
+        }
+        let res: Complex = new Complex(); let flag = true;
+        for (const i of x) {
+            if (flag) { res.plus(i as Complex); flag = false; }
+            else
+                res.minus(i as Complex);
+        }
+        return res;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+// =
+function equal() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length < 1) {
+            throw new Error("- : expected at least 1 argument");
+        }
+        let res = x[0] as Complex;
+        for (const i of x) {
+            if (!res.equal(i as Complex)) {
+                return new MyBool(false);
+            }
+        }
+        return new MyBool(true);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
 
 export function baseEnv(): SimpleEnv {
     let res = new SimpleEnv();
     res.Set("+", plus());
+    res.Set("-", sub());
+    res.Set("=", equal());
     return res;
 }

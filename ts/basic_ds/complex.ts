@@ -13,9 +13,7 @@ export class Rational {
             res.Denominator = Math.pow(10, sl[1].length);
             res.Numerator = res.Denominator * Number.parseInt(sl[0])
                 + Number.parseInt(sl[1]);
-            let g = gcd(res.Numerator, res.Denominator);
-            res.Denominator /= g;
-            res.Numerator /= g;
+            res.reduce();
         }
         return res;
     }
@@ -41,13 +39,29 @@ export class Rational {
             return `${this.Numerator}/${this.Denominator}`;
         }
     }
+    reduce() {
+        if (this.Numerator === 0) {
+            this.Denominator = 1;
+            return;
+        }
+        let g = gcd(this.Numerator, this.Denominator);
+        this.Denominator /= g;
+        this.Numerator /= g;
+    }
     plus(rhs: Rational) {
         this.Numerator *= rhs.Denominator;
         this.Numerator += rhs.Numerator * this.Denominator;
         this.Denominator *= rhs.Denominator;
-        let g = gcd(this.Numerator, this.Denominator);
-        this.Denominator /= g;
-        this.Numerator /= g;
+        this.reduce();
+    }
+    minus(rhs: Rational) {
+        this.Numerator *= rhs.Denominator;
+        this.Numerator -= rhs.Numerator * this.Denominator;
+        this.Denominator *= rhs.Denominator;
+        this.reduce();
+    }
+    equal(rhs: Rational) {
+        return this.Numerator === rhs.Numerator && this.Denominator === rhs.Denominator;
     }
 }
 
@@ -119,6 +133,28 @@ export class Real {
             this.Value = this.Value + rhs.toNumber()
         }
     }
+    minus(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                this.Value.minus(rhs.Value);
+            } else {
+                this.Value = this.Value.toNumber() - rhs.toNumber()
+            }
+        } else {
+            this.Value = this.Value - rhs.toNumber()
+        }
+    }
+    equal(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                return this.Value.equal(rhs.Value);
+            } else {
+                return this.Value.toNumber() === rhs.toNumber()
+            }
+        } else {
+            return this.Value === rhs.toNumber()
+        }
+    }
 }
 
 export class Complex implements DS {
@@ -142,6 +178,14 @@ export class Complex implements DS {
     plus(rhs: Complex) {
         this.RealPart.plus(rhs.RealPart);
         this.UnRealPart.plus(rhs.UnRealPart);
+    }
+    minus(rhs: Complex) {
+        this.RealPart.minus(rhs.RealPart);
+        this.UnRealPart.minus(rhs.UnRealPart);
+    }
+    equal(rhs: Complex) {
+        return this.RealPart.equal(rhs.RealPart)
+            && this.UnRealPart.equal(rhs.UnRealPart);
     }
 }
 

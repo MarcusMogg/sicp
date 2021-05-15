@@ -6,8 +6,8 @@ import { Identifier, Quotation } from "../basic_ds/quote";
 import { MyChar, MyString } from "../basic_ds/string";
 import * as TT from "../tokenizer/toke_type"
 
-export function parse(token: Generator<TT.TokenType, void, unknown>, befor?: TT.TokenType): DS {
-    let cur; let t: TT.TokenType;
+export function parse(token: Generator<TT.TokenType, void, unknown>, befor?: IteratorResult<TT.TokenType, void>): DS {
+    let cur: IteratorResult<TT.TokenType, void>; let t: TT.TokenType;
     if (befor === undefined) {
         cur = token.next();
         if (cur.done) {
@@ -24,6 +24,9 @@ export function parse(token: Generator<TT.TokenType, void, unknown>, befor?: TT.
         }
         t = cur.value as TT.TokenType;
     };
+    while (t.Type === TT.TokenComment.Type) {
+        next();
+    }
     if (t.Type === TT.TokenApostrophe.Type) {
         let tmp = new Quotation();
         tmp.Value = parse(token);
