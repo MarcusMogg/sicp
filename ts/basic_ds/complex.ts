@@ -21,6 +21,7 @@ export class Rational {
         let res = new Rational()
         res.Numerator = n;
         res.Denominator = d;
+        res.reduce();
         return res;
     }
     static MakeFromRational(v: Rational): Rational {
@@ -47,6 +48,10 @@ export class Rational {
         let g = gcd(this.Numerator, this.Denominator);
         this.Denominator /= g;
         this.Numerator /= g;
+        if (this.Denominator < 0) {
+            this.Denominator *= -1;
+            this.Numerator *= -1;
+        }
     }
     plus(rhs: Rational) {
         this.Numerator *= rhs.Denominator;
@@ -58,6 +63,16 @@ export class Rational {
         this.Numerator *= rhs.Denominator;
         this.Numerator -= rhs.Numerator * this.Denominator;
         this.Denominator *= rhs.Denominator;
+        this.reduce();
+    }
+    times(rhs: Rational) {
+        this.Numerator *= rhs.Numerator;
+        this.Denominator *= rhs.Denominator;
+        this.reduce();
+    }
+    div(rhs: Rational) {
+        this.Numerator *= rhs.Denominator;
+        this.Denominator *= rhs.Numerator;
         this.reduce();
     }
     equal(rhs: Rational) {
@@ -108,10 +123,7 @@ export class Real {
         }
     }
     Zero() {
-        if (this.Value instanceof Rational) {
-            return this.Value.Numerator === 0;
-        }
-        return false;
+        return this.toNumber() === 0;
     }
 
     toNumber(): number {
@@ -144,7 +156,7 @@ export class Real {
             this.Value = this.Value - rhs.toNumber()
         }
     }
-    equal(rhs: Real) {
+    equalS(rhs: Real) {
         if (this.Value instanceof Rational) {
             if (rhs.Value instanceof Rational) {
                 return this.Value.equal(rhs.Value);
@@ -153,6 +165,42 @@ export class Real {
             }
         } else {
             return this.Value === rhs.toNumber()
+        }
+    }
+    equal(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                return this.Value.equal(rhs.Value);
+            } else {
+                return false;
+            }
+        } else {
+            if (rhs.Value instanceof Rational) {
+                return false;
+            }
+            return this.Value === rhs.toNumber()
+        }
+    }
+    times(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                this.Value.times(rhs.Value);
+            } else {
+                this.Value = this.Value.toNumber() * rhs.toNumber()
+            }
+        } else {
+            this.Value = this.Value * rhs.toNumber()
+        }
+    }
+    div(rhs: Real) {
+        if (this.Value instanceof Rational) {
+            if (rhs.Value instanceof Rational) {
+                this.Value.div(rhs.Value);
+            } else {
+                this.Value = this.Value.toNumber() / rhs.toNumber()
+            }
+        } else {
+            this.Value = this.Value / rhs.toNumber()
         }
     }
 }
@@ -183,10 +231,55 @@ export class Complex implements DS {
         this.RealPart.minus(rhs.RealPart);
         this.UnRealPart.minus(rhs.UnRealPart);
     }
-    equal(rhs: Complex) {
-        return this.RealPart.equal(rhs.RealPart)
-            && this.UnRealPart.equal(rhs.UnRealPart);
+    equal(rhs: DS) {
+        if (rhs instanceof Complex) {
+            return this.RealPart.equal(rhs.RealPart)
+                && this.UnRealPart.equal(rhs.UnRealPart);
+        }
+        return false;
     }
+    equalS(rhs: Complex) {
+        return this.RealPart.equalS(rhs.RealPart)
+            && this.UnRealPart.equalS(rhs.UnRealPart);
+    }
+    // FIXME: Maybe I need return a new Complex after operate
+    times(rhs: Complex) {
+        let tmp = new Complex(); tmp.plus(this);
+        tmp.RealPart.times(rhs.RealPart);
+        tmp.UnRealPart.times(rhs.UnRealPart);
+        tmp.RealPart.minus(tmp.UnRealPart);
+
+        this.RealPart.times(rhs.UnRealPart);
+        this.UnRealPart.times(rhs.RealPart);
+        this.UnRealPart.plus(this.RealPart);
+
+        this.RealPart = tmp.RealPart;
+    }
+    div(rhs: Complex) {
+        let t1 = Real.MakeFromFloat(true, 0); t1.plus(rhs.RealPart); t1.times(rhs.RealPart);
+        let t2 = Real.MakeFromFloat(true, 0); t2.plus(rhs.UnRealPart); t2.times(rhs.UnRealPart);
+        t1.plus(t2);
+
+        let tmp = new Complex(); tmp.plus(this);
+        tmp.RealPart.times(rhs.RealPart);
+        tmp.UnRealPart.times(rhs.UnRealPart);
+        tmp.RealPart.plus(tmp.UnRealPart);
+
+        this.RealPart.times(rhs.UnRealPart);
+        this.UnRealPart.times(rhs.RealPart);
+        this.UnRealPart.minus(this.RealPart);
+
+        this.RealPart = tmp.RealPart;
+        this.RealPart.div(t1);
+        this.UnRealPart.div(t1);
+    }
+
+    less(rhs: Complex): boolean {
+        return this.RealPart.toNumber() < rhs.RealPart.toNumber()
+            || (this.RealPart.toNumber() === rhs.RealPart.toNumber()
+                && this.UnRealPart.toNumber() < rhs.UnRealPart.toNumber())
+    }
+
 }
 
 const gcd = (a: number, b: number): number => {

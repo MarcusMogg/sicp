@@ -49,6 +49,9 @@ export class Cons implements DS {
 
     toArray(): Array<DS> {
         let res = new Array<DS>();
+        if (Cons.null(this)) {
+            return res;
+        }
         res.push(this.car());
         if (this.second !== undefined) {
             if (this.second instanceof Cons) {
@@ -62,8 +65,23 @@ export class Cons implements DS {
 
     static List(...data: Array<DS>): Cons {
         if (data.length === 0) {
-            return undefined;
+            return Cons.nil();
         }
         return new Cons(data[0], Cons.List(...data.splice(1)));
     }
+
+    static nil(): Cons {
+        return new Cons(undefined, undefined);
+    }
+
+    equal(rhs: DS): boolean {
+        return rhs.Type === Cons.Type &&
+            this.first === (rhs as Cons).first &&
+            this.second === (rhs as Cons).second;
+    }
+
+    static null(v: Cons): boolean {
+        return v === undefined || (v.first === undefined && v.second === undefined);
+    }
+
 }

@@ -19,13 +19,16 @@ export function parse(token: Generator<TT.TokenType, void, unknown>, befor?: Ite
     t = cur.value as TT.TokenType;
     let next = () => {
         cur = token.next();
-        if (cur.done) {
+        if (cur.done && t.Type !== TT.TokenComment.Type) {
             throw new Error("Datum parse error: unexpected EOF");
         }
         t = cur.value as TT.TokenType;
     };
     while (t.Type === TT.TokenComment.Type) {
         next();
+        if (cur.done) {
+            return undefined;
+        }
     }
     if (t.Type === TT.TokenApostrophe.Type) {
         let tmp = new Quotation();

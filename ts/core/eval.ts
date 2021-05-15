@@ -60,7 +60,7 @@ function definitionValue(exp: DS): DS {
         let cadr = (exp as Cons).cadr("ad");
         if (cadr.Type === Identifier.Type) {
             let next = (exp as Cons).cadr("dd") as Cons;
-            if (next.cdr() !== undefined) {
+            if (!Cons.null(next.cdr() as Cons)) {
                 flag = 1;
                 throw new Error();
             }
@@ -89,8 +89,8 @@ function ifConsequent(exp: DS) {
 }
 function ifAlternative(exp: DS) {
     let cdddr = (exp as Cons).cadr("ddd");
-    if (cdddr !== undefined) {
-        if ((cdddr as Cons).cdr() !== undefined) {
+    if (!Cons.null(cdddr as Cons)) {
+        if (!Cons.null((cdddr as Cons).cdr() as Cons)) {
             throw new Error("if error: multiple expression");
         }
         return (cdddr as Cons).car();
@@ -102,7 +102,7 @@ function evalIF(exp: DS, env: Env): DS {
         return Eval(ifConsequent(exp), env);
     } else {
         let alter = ifAlternative(exp);
-        if (alter !== undefined) {
+        if (!Cons.null(alter as Cons)) {
             //console.log(alter.DisplayStr())
             return Eval(alter, env);
         }
@@ -111,7 +111,7 @@ function evalIF(exp: DS, env: Env): DS {
 }
 
 export function evalSequence(exp: DS, env: Env): DS {
-    if ((exp as Cons).cdr() === undefined) {
+    if (Cons.null((exp as Cons).cdr() as Cons)) {
         return Eval((exp as Cons).car(), env);
     }
     // FIXME: 这里的值是否要处理
@@ -120,7 +120,7 @@ export function evalSequence(exp: DS, env: Env): DS {
 }
 
 function makeIF(predicate: DS, consequent: DS, alternative: DS): Cons {
-    if (alternative === undefined) {
+    if (Cons.null(alternative as Cons)) {
         return Cons.List(new Identifier("if"), predicate, consequent);
     }
     return Cons.List(new Identifier("if"), predicate, consequent, alternative);
@@ -135,24 +135,24 @@ function makeProcedure(params: Cons, body: DS, env: Env): Procedure {
 }
 
 function sequenceExp(exp: Cons) {
-    if (exp === undefined) {
+    if (Cons.null(exp)) {
         return undefined;
     }
-    if (exp.cdr() === undefined) {
+    if (Cons.null(exp.cdr() as Cons)) {
         return exp.car();
     }
     return new Cons(new Identifier("begin"), exp)
 }
 
 function makeCond(exp: DS): DS {
-    if (exp === undefined) {
-        return undefined;
+    if (Cons.null(exp as Cons)) {
+        return Cons.nil();
     }
     let first = (exp as Cons).car() as Cons;
     let rest = (exp as Cons).cdr() as Cons;
 
     if (Datum.taggedList(first, "else")) {
-        if (rest !== undefined) {
+        if (!Cons.null(rest)) {
             throw new Error("cond : else clause isn't last");
         }
         return sequenceExp(first.cdr() as Cons);
@@ -166,11 +166,11 @@ function evalLet(exp: DS, env: Env): DS {
     let body = (exp as Cons).cdr() as Cons;
 
     let v = new Array<DS>(), vs = new Array<DS>();
-    while (params !== undefined) {
+    while (!Cons.null(params)) {
         let cur = params.car() as Cons;
         v.push(cur.car());
         vs.push(cur.cadr("ad"));
-        if (cur.cadr("dd") !== undefined) {
+        if (!Cons.null(cur.cadr("dd") as Cons)) {
             throw new Error("let : multiple expression");
         }
         params = params.cdr() as Cons;
@@ -180,8 +180,8 @@ function evalLet(exp: DS, env: Env): DS {
 }
 
 function listOfValues(exp: DS, env: Env): Cons {
-    if (exp === undefined) {
-        return undefined;
+    if (Cons.null(exp as Cons)) {
+        return Cons.nil();
     }
     return new Cons(Eval((exp as Cons).car(), env),
         listOfValues((exp as Cons).cdr(), env))

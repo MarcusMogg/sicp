@@ -18,4 +18,7 @@ export class Procedure implements DS {
         this.body = body;
         this.env = env;
     }
+    equal(rhs: DS): boolean {
+        return this === rhs;
+    }
 }

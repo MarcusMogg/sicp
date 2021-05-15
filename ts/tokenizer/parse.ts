@@ -385,18 +385,19 @@ export function* Tokenizer(input: string) {
                         } else {
                             state = DFAState.Fail;
                         }
-                    } else if (cs === "#") {
+                    } else if (cs === "e") {
                         if ((token as Token.TokenComplex).Radix !== 10) {
                             state = DFAState.Fail;
                         } else {
                             (token as Token.TokenComplex).appendValue(cs);
-                            state = DFAState.SuffixB;
+                            state = DFAState.SuffixE;
                         }
                     } else if (cs === ".") {
                         if ((token as Token.TokenComplex).Radix !== 10) {
                             (token as Token.TokenComplex).appendValue(cs);
                             state = DFAState.Fail;
                         } else {
+                            (token as Token.TokenComplex).appendValue(cs);
                             state = DFAState.DecimalB;
                         }
                     } else if (cs === "i") {
@@ -427,12 +428,27 @@ export function* Tokenizer(input: string) {
                     (token as Token.TokenComplex).appendValue(cs);
                     state = DFAState.UintegerRE;
                     next();
-                } else if (cs === "+" || cs === "-" || "@") {
+                } else if (cs === "+" || cs === "-" || cs === "@") {
                     if ((token as Token.TokenComplex).Part === 0) {
                         (token as Token.TokenComplex).Part = 1;
                         if (cs === "-")
                             (token as Token.TokenComplex).setSign(-1);
                         state = DFAState.Complex;
+                        next();
+                    } else {
+                        state = DFAState.Fail;
+                    }
+                } else if (cs === "e") {
+                    if ((token as Token.TokenComplex).Radix !== 10) {
+                        state = DFAState.Fail;
+                    } else {
+                        (token as Token.TokenComplex).appendValue(cs);
+                        state = DFAState.SuffixE;
+                        next();
+                    }
+                } else if (cs === "i") {
+                    if ((token as Token.TokenComplex).Part === 1) {
+                        state = DFAState.End;
                         next();
                     } else {
                         state = DFAState.Fail;
@@ -467,21 +483,21 @@ export function* Tokenizer(input: string) {
                     } else {
                         state = DFAState.Fail;
                     }
-                } else if (cs === "#") {
-                    state = DFAState.SuffixB;
+                } else if (cs === "e") {
+                    state = DFAState.SuffixE;
                     next();
                 } else {
                     state = DFAState.Fail;
                 }
                 break;
-            case DFAState.SuffixB:
-                if (cs === "e") {
-                    state = DFAState.SuffixE;
-                } else {
-                    state = DFAState.Fail;
-                }
-                next();
-                break;
+            // case DFAState.SuffixB:
+            //     if (cs === "e") {
+            //         state = DFAState.SuffixE;
+            //     } else {
+            //         state = DFAState.Fail;
+            //     }
+            //     next();
+            //     break;
             case DFAState.SuffixE:
                 if (find(digit.get(10), cs)) {
                     (token as Token.TokenComplex).appendSuffix(cs);

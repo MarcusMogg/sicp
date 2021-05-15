@@ -20,9 +20,9 @@ export class SimpleEnv implements Env {
         if (this.map_.has(key)) {
             return this.map_.get(key);
         }
-        return this.parent_ === undefined ?
-            undefined :
-            this.parent_.Get(key);
+        if (this.parent_ === undefined)
+            throw new Error(`undeclare ${key}`);
+        return this.parent_.Get(key);
     }
     Set(key: string, vaule: DS) {
         this.map_.set(key, vaule);

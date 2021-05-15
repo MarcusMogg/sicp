@@ -126,7 +126,7 @@ class complexPart {
         let sn = this.suffix.length > 0 ? Number.parseInt(this.suffix) : 0;
         let exactness = e === 2 ? false : true;
         if (this.value.indexOf(".") !== -1) {
-            let x = this.sign * Number.parseFloat(this.value) * Math.pow(10, sn);
+            let x = this.sign * Number.parseFloat(this.value);
             if (e === 1) { // force to Rational
                 return { r: DSC.Real.MakeFromFloat(true, x), e: true };
             } else {

@@ -14,4 +14,8 @@ export class MyBool implements DS {
     static isTrue(exp: DS) {
         return exp.Type !== MyBool.Type || (exp as MyBool).Value;
     }
+
+    equal(rhs: DS): boolean {
+        return rhs.Type === MyBool.Type && this.Value === (rhs as MyBool).Value;
+    }
 }

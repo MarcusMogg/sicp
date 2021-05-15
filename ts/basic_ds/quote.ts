@@ -2,9 +2,12 @@ import { DS } from "./bs"
 export class Quotation implements DS {
     static readonly Type = "Quotation";
     readonly Type = Quotation.Type
-    Value: any;
+    Value: DS;
     DisplayStr() {
         return `'${this.Value}`;
+    }
+    equal(rhs: DS): boolean {
+        return rhs.Type === Quotation.Type && this.Value.equal((rhs as Quotation).Value);
     }
 }
 
@@ -17,5 +20,8 @@ export class Identifier implements DS {
     }
     DisplayStr() {
         return `${this.Value}`;
+    }
+    equal(rhs: DS): boolean {
+        return rhs.Type === Identifier.Type && this.Value === (rhs as Identifier).Value;
     }
 }
