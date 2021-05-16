@@ -1,3 +1,4 @@
+import { Identifier } from "../basic_ds/quote";
 import { DFAState } from "./dfs_state"
 import * as Token from "./toke_type"
 
@@ -354,9 +355,9 @@ export function* Tokenizer(input: string) {
                 if (find(delimiter, cs)) {
                     state = DFAState.End;
                 } else if (find(digit.get(10), cs)) {
-                    let s = token.Value;
+                    let s = token.Value as Identifier;
                     token = new Token.TokenComplex();
-                    if (s === "-") {
+                    if (s.Value === "-") {
                         (token as Token.TokenComplex).setSign(-1);
                     }
                     (token as Token.TokenComplex).appendValue(cs);

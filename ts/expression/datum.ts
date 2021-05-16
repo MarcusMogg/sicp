@@ -112,6 +112,14 @@ export function letS(exp: DS) {
     return taggedList(exp, "let")
 }
 
+export function andS(exp: DS) {
+    return taggedList(exp, "and")
+}
+
+export function orS(exp: DS) {
+    return taggedList(exp, "or")
+}
+
 export function application(exp: DS) {
     return exp.Type === Cons.Type;
 }

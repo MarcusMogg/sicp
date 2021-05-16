@@ -133,7 +133,9 @@ export class Real {
             return this.Value;
         }
     }
-
+    toInt(): number {
+        return Number.parseInt(this.toNumber().toString());
+    }
     plus(rhs: Real) {
         if (this.Value instanceof Rational) {
             if (rhs.Value instanceof Rational) {
@@ -282,7 +284,7 @@ export class Complex implements DS {
 
 }
 
-const gcd = (a: number, b: number): number => {
+export const gcd = (a: number, b: number): number => {
     if (a == 0) return b;
     return gcd(b % a, a);
 }

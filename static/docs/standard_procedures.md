@@ -36,6 +36,8 @@ only integer
 
 `(not obj)` returns #t if obj is false, and returns #f otherwise.
 
+and 和 no 不是函数
+
 ## pairs
 
 `(pair? obj) `

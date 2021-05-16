@@ -32,6 +32,10 @@ export function Eval(exp: DS, env: Env): DS {
         return Eval(makeCond((exp as Cons).cdr()), env);
     } else if (Datum.letS(exp)) {
         return evalLet(((exp as Cons).cdr()), env);
+    } else if (Datum.andS(exp)) {
+        return evalAnd(((exp as Cons).cdr()), env);
+    } else if (Datum.orS(exp)) {
+        return evalOR(((exp as Cons).cdr()), env);
     } else if (Datum.application(exp)) {
         let op = Eval((exp as Cons).car(), env) as Procedure;
         let vals = listOfValues((exp as Cons).cdr(), env)
@@ -102,7 +106,7 @@ function evalIF(exp: DS, env: Env): DS {
         return Eval(ifConsequent(exp), env);
     } else {
         let alter = ifAlternative(exp);
-        if (!Cons.null(alter as Cons)) {
+        if (alter !== undefined || alter.Type !== Cons.Type || !Cons.null(alter as Cons)) {
             //console.log(alter.DisplayStr())
             return Eval(alter, env);
         }
@@ -120,7 +124,7 @@ export function evalSequence(exp: DS, env: Env): DS {
 }
 
 function makeIF(predicate: DS, consequent: DS, alternative: DS): Cons {
-    if (Cons.null(alternative as Cons)) {
+    if (alternative === undefined || (alternative.Type === Cons.Type && Cons.null(alternative as Cons))) {
         return Cons.List(new Identifier("if"), predicate, consequent);
     }
     return Cons.List(new Identifier("if"), predicate, consequent, alternative);
@@ -175,8 +179,32 @@ function evalLet(exp: DS, env: Env): DS {
         }
         params = params.cdr() as Cons;
     }
-    // FIXME：函数执行需要修改环境，应该相当于application
-    return Apply(Eval(makeLambda(Cons.List(...v), body), env) as Procedure, params);
+    return Apply(Eval(makeLambda(Cons.List(...v), body), env) as Procedure, Cons.List(...vs));
+}
+
+function evalAnd(exp: DS, env: Env): DS {
+    if (Cons.null(exp as Cons)) {
+        return new MyBool(true);
+    }
+    let first = (exp as Cons).car();
+    let second = (exp as Cons).cdr();
+    if (Cons.null(second as Cons)) {
+        return Eval(first, env);
+    }
+    return Eval(makeIF(first, new Cons(new Identifier("and"), second), new MyBool(false)), env);
+}
+
+function evalOR(exp: DS, env: Env): DS {
+    if (Cons.null(exp as Cons)) {
+        return new MyBool(false);
+    }
+    let first = (exp as Cons).car();
+    let second = (exp as Cons).cdr();
+    if (Cons.null(second as Cons)) {
+        return Eval(first, env);
+    }
+    first = Eval(first, env);
+    return Eval(makeIF(first, first, new Cons(new Identifier("or"), second)), env);
 }
 
 function listOfValues(exp: DS, env: Env): Cons {

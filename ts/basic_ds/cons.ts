@@ -84,4 +84,8 @@ export class Cons implements DS {
         return v === undefined || (v.first === undefined && v.second === undefined);
     }
 
+    isList(): boolean {
+        if (Cons.null(this)) return true;
+        return this.second.Type === Cons.Type && (this.second as Cons).isList();
+    }
 }

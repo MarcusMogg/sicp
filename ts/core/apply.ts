@@ -1,9 +1,10 @@
 import { MyBool } from "../basic_ds/boolean";
 import { DS } from "../basic_ds/bs";
-import { Complex, Rational, Real } from "../basic_ds/complex";
+import { Complex, Rational, Real, gcd } from "../basic_ds/complex";
 import { Cons } from "../basic_ds/cons";
 import { Procedure } from "../basic_ds/procedure";
 import { Identifier } from "../basic_ds/quote";
+import { MyChar, MyString } from "../basic_ds/string";
 import { Env, SimpleEnv } from "../environment/env_base";
 import { evalSequence } from "./eval";
 
@@ -283,6 +284,187 @@ function div() {
     }
     return new Procedure(true, undefined, body, undefined);
 }
+//(quotient n1 n2)
+function quotient() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 2) {
+            throw new Error("quotient : expected 2 arguments");
+        }
+        let a = (x[0] as Complex).RealPart.toInt();
+        let b = (x[1] as Complex).RealPart.toInt();
+        let res = new Complex();
+        a -= a % b;
+        res.RealPart = Real.MakeFromRational(Rational.MakeFromInteger(a / b, 1));
+        return res;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(remainder n1 n2)
+function remainder() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 2) {
+            throw new Error("remainder : expected 2 arguments");
+        }
+        let a = (x[0] as Complex).RealPart.toInt();
+        let b = (x[1] as Complex).RealPart.toInt();
+        let res = new Complex();
+        res.RealPart = Real.MakeFromRational(Rational.MakeFromInteger(a % b, 1));
+        return res;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(gcd n1 n2)
+function gcdf() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 2) {
+            throw new Error("gcd : expected 2 arguments");
+        }
+        let a = (x[0] as Complex).RealPart.toInt();
+        let b = (x[1] as Complex).RealPart.toInt();
+        let res = new Complex();
+        res.RealPart = Real.MakeFromRational(Rational.MakeFromInteger(gcd(a, b), 1));
+        return res;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(lcm n1 n2)
+function lcm() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 2) {
+            throw new Error("lcm : expected 2 arguments");
+        }
+        let a = (x[0] as Complex).RealPart.toInt();
+        let b = (x[1] as Complex).RealPart.toInt();
+        let res = new Complex();
+        res.RealPart = Real.MakeFromRational(Rational.MakeFromInteger(a / gcd(a, b) * b, 1));
+        return res;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(not obj)
+function not() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("not : expected 2 arguments");
+        }
+        return new MyBool(x[0].Type === MyBool.Type && !(x[0] as MyBool).Value);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(pair? obj) 
+function isPair() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("pair? : expected 1 arguments");
+        }
+        return new MyBool(x[0].Type === Cons.Type);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(cons obj1 obj2) 
+function cons() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 2) {
+            throw new Error("cons : expected 2 arguments");
+        }
+        return new Cons(x[0], x[1]);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(car pair) 
+function car() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("car : expected 1 arguments");
+        }
+        return (x[0] as Cons).car();
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(cdr pair) 
+function cdr() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("cdr : expected 1 arguments");
+        }
+        return (x[0] as Cons).cdr();
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(ca...d...r pair) 
+function cadsr(ads: string) {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error(`c${ads}r : expected 1 arguments`);
+        }
+        return (x[0] as Cons).cadr(ads);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(null? obj) 
+function isNull() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("cdr : expected 1 arguments");
+        }
+        return new MyBool(Cons.null(x[0] as Cons));
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(list? obj) 
+function isList() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("list? : expected 1 arguments");
+        }
+        return new MyBool((x[0] as Cons).isList());
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+//(list obj ...) 
+function list() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length < 1) {
+            throw new Error("list : expected at least 1 arguments");
+        }
+        return Cons.List(...x);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+
+// (symbol? obj)
+function isSymbol() {
+    let body = (x: Array<DS>): DS => {
+        if (x.length != 1) {
+            throw new Error("symbol? : expected 1 arguments");
+        }
+        return new MyBool(x[0].Type === Identifier.Type);
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+// (dsiplay obj)
+function dsiplay() {
+    let body = (x: Array<DS>): DS => {
+        for (const iterator of x) {
+            if (iterator instanceof MyString || iterator instanceof MyChar) {
+                process.stdout.write(iterator.Value);
+            } else {
+                process.stdout.write(iterator.DisplayStr());
+            }
+
+        }
+        return undefined;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
+// (newline)
+function newline() {
+    let body = (x: Array<DS>): DS => {
+        console.log("");
+        return undefined;
+    }
+    return new Procedure(true, undefined, body, undefined);
+}
 
 export function baseEnv(): SimpleEnv {
     let res = new SimpleEnv();
@@ -291,10 +473,10 @@ export function baseEnv(): SimpleEnv {
     res.Set("*", times());
     res.Set("/", div());
     res.Set("=", equal());
-    res.Set(">", less());
-    res.Set(">=", lessE());
-    res.Set("<", great());
-    res.Set("<=", greatE());
+    res.Set("<", less());
+    res.Set("<=", lessE());
+    res.Set(">", great());
+    res.Set(">=", greatE());
     res.Set("eq?", equal1());
     res.Set("equal?", equal2());
     res.Set("nil", Cons.nil());
@@ -303,5 +485,38 @@ export function baseEnv(): SimpleEnv {
     res.Set("real?", isReal());
     res.Set("rational?", isRational());
     res.Set("integer?", isInteger());
+    res.Set("quotient", quotient());
+    res.Set("remainder", remainder());
+    res.Set("gcd", gcdf());
+    res.Set("lcm", lcm());
+    res.Set("not", not());
+    res.Set("pair?", isPair());
+    res.Set("cons", cons());
+    res.Set("car", car());
+    res.Set("cdr", cdr());
+    res.Set("null?", isNull());
+    res.Set("list?", isList());
+    res.Set("list", list());
+    res.Set("symbol?", isSymbol());
+    res.Set("display", dsiplay());
+    res.Set("newline", newline());
+    let setCads = (k: number) => {
+        for (let i = 0; i < (1 << k); i++) {
+            let ads = "";
+            for (let j = 0; j < k; j++) {
+                if (((i >> j) & 1) === 0) {
+                    ads += "a";
+                } else {
+                    ads += "d";
+                }
+            }
+            let tmp = `c${ads}r`;
+            //console.log(tmp);
+            res.Set(tmp, cadsr(ads));
+        }
+    }
+    setCads(2);
+    setCads(3);
+    setCads(4);
     return res;
 }
