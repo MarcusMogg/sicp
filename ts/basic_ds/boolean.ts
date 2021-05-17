@@ -18,4 +18,7 @@ export class MyBool implements DS {
     equal(rhs: DS): boolean {
         return rhs.Type === MyBool.Type && this.Value === (rhs as MyBool).Value;
     }
+    Copy(): DS {
+        return new MyBool(this.Value);
+    }
 }

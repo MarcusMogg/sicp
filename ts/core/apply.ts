@@ -6,14 +6,19 @@ import { Procedure } from "../basic_ds/procedure";
 import { Identifier } from "../basic_ds/quote";
 import { MyChar, MyString } from "../basic_ds/string";
 import { Env, SimpleEnv } from "../environment/env_base";
+import { Output } from "../main";
 import { evalSequence } from "./eval";
 
 // TODO: 如何表示一个过程
 export function Apply(produce: Procedure, params: Cons): DS {
+    let cp = produce.Copy() as Procedure;
     if (produce.primitive) {
-        return (produce.body as ((x: Array<DS>) => DS))(params.toArray())
+        let res = (produce.body as ((x: Array<DS>) => DS))(params.toArray());
+        Output.getInstance().replace(produce, res)
+        return res;
     } else {
-        return evalSequence(produce.body as DS, extendEnv(produce.env, produce.parameters, params))
+        Output.getInstance().replace(produce, cp.body)
+        return evalSequence(produce, extendEnv(cp.env, cp.parameters, params))
     }
 }
 
@@ -447,9 +452,9 @@ function dsiplay() {
     let body = (x: Array<DS>): DS => {
         for (const iterator of x) {
             if (iterator instanceof MyString || iterator instanceof MyChar) {
-                process.stdout.write(iterator.Value);
+                Output.getInstance().display(iterator.Value);
             } else {
-                process.stdout.write(iterator.DisplayStr());
+                Output.getInstance().display(iterator.DisplayStr());
             }
 
         }
@@ -460,7 +465,7 @@ function dsiplay() {
 // (newline)
 function newline() {
     let body = (x: Array<DS>): DS => {
-        console.log("");
+        Output.getInstance().display("\n");
         return undefined;
     }
     return new Procedure(true, undefined, body, undefined);

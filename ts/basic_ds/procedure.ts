@@ -5,7 +5,11 @@ export class Procedure implements DS {
     static readonly Type = "procedure";
     readonly Type = Procedure.Type;
     DisplayStr() {
-        return "procedure";
+        if (this.primitive)
+            return "basic_procedure";
+        else {
+            return `(lambda (${this.parameters.map(x => x.Value).join(" ")}) ${(this.body as DS).DisplayStr()}`
+        }
     }
     primitive: boolean;
     parameters: Array<Identifier>;
@@ -20,5 +24,13 @@ export class Procedure implements DS {
     }
     equal(rhs: DS): boolean {
         return this === rhs;
+    }
+    Copy(): DS {
+        return new Procedure(this.primitive,
+            (this.parameters !== undefined) ?
+                this.parameters.map(x => x.Copy() as Identifier) :
+                this.parameters,
+            this.primitive ? this.body : (this.body as DS).Copy(),
+            this.env);
     }
 }

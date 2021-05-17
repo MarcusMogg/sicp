@@ -281,7 +281,12 @@ export class Complex implements DS {
             || (this.RealPart.toNumber() === rhs.RealPart.toNumber()
                 && this.UnRealPart.toNumber() < rhs.UnRealPart.toNumber())
     }
-
+    Copy(): DS {
+        let res = new Complex();
+        res.RealPart = this.RealPart;
+        res.UnRealPart = this.UnRealPart;
+        return res;
+    }
 }
 
 export const gcd = (a: number, b: number): number => {

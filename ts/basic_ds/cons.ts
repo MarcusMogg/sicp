@@ -88,4 +88,15 @@ export class Cons implements DS {
         if (Cons.null(this)) return true;
         return this.second.Type === Cons.Type && (this.second as Cons).isList();
     }
+
+    Copy(): DS {
+        let f = undefined, s = undefined;
+        if (this.first !== undefined) {
+            f = this.first.Copy();
+        }
+        if (this.second !== undefined) {
+            s = this.second.Copy();
+        }
+        return new Cons(f, s);
+    }
 }

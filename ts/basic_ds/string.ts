@@ -9,6 +9,11 @@ export class MyString implements DS {
     equal(rhs: DS): boolean {
         return rhs.Type === MyString.Type && this.Value === (rhs as MyString).Value;
     }
+    Copy(): DS {
+        let res = new MyString();
+        res.Value = this.Value;
+        return res;
+    }
 }
 export class MyChar implements DS {
     static readonly Type = "MyChar";
@@ -22,5 +27,8 @@ export class MyChar implements DS {
     }
     equal(rhs: DS): boolean {
         return rhs.Type === MyChar.Type && this.Value === (rhs as MyChar).Value;
+    }
+    Copy(): DS {
+        return new MyChar(this.Value);
     }
 }
