@@ -2,3 +2,6 @@ node_modules
 build
 logs
 .vscode
+.temp
+.cache
+dist
