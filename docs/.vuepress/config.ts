@@ -4,6 +4,7 @@ import { path } from '@vuepress/utils'
 export default defineUserConfig<DefaultThemeOptions>({
     lang: 'zh-CN',
     title: 'Hello SICP',
+    description: "在线运行sicp代码",
     base: '/sicp/',
     themeConfig: {
         logo: '/sicp/main-banner.gif',

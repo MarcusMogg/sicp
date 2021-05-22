@@ -16,7 +16,7 @@ export function Eval(exp: DS, env: Env): DS {
         return exp;
     } else if (Datum.variable(exp)) {
         let result = env.Get((exp as Identifier).Value);
-        if ((result as DS).Type !== Procedure.Type)
+        if (result !== undefined && (result as DS).Type !== Procedure.Type)
             Output.getInstance().replace(exp, result);
         return result;
     } else if (Datum.quoted(exp)) {

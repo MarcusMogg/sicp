@@ -32,9 +32,11 @@ export class Output {
         this.display_(s);
     }
     replace(target: any, source: any, show = true) {
-        Object.assign(target, source);
-        Object.setPrototypeOf(target, Object.getPrototypeOf(source));
-        if (show) this.subShow()
+        if (source !== undefined) {
+            Object.assign(target, source);
+            Object.setPrototypeOf(target, Object.getPrototypeOf(source));
+            if (show) this.subShow()
+        }
     }
     setDisplay(f: (string) => void) {
         this.display_ = f;

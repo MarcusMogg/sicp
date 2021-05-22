@@ -1,60 +1,118 @@
 ---
 home: true
 title: 首页
-heroImage: /images/hero.png
+
 actions:
-  - text: 快速上手
-    link: /zh/guide/getting-started.html
+  - text: sicp解题集
+    link: /chap1/
     type: primary
-  - text: 项目简介
-    link: /zh/guide/
+  - text: scheme解释器实现
+    link: /syntax/
     type: secondary
-features:
-  - title: 简洁至上
-    details: 以 Markdown 为中心的项目结构，以最少的配置帮助你专注于写作。
-  - title: Vue 驱动
-    details: 享受 Vue 的开发体验，可以在 Markdown 中使用 Vue 组件，又可以使用 Vue 来开发自定义主题。
-  - title: 高性能
-    details: VuePress 会为每个页面预渲染生成静态的 HTML，同时，每个页面被加载的时候，将作为 SPA 运行。
-  - title: 主题
-    details: 提供了一个开箱即用的默认主题。你也可以挑选一个社区主题，或者创建一个你自己的主题。
-  - title: 插件
-    details: 灵活的插件API，使得插件可以为你的站点提供许多即插即用的功能。
-  - title: 打包工具
-    details: 既支持 Webpack 也支持 Vite。选一个你喜欢的来使用吧！
-footer: MIT Licensed | Copyright © 2018-present Evan You
+footer: MIT Licensed | Copyright © 2021-present MoggMa
 ---
 
-### 像数 1, 2, 3 一样容易
+### 尝试一下
 
-<CodeGroup>
-  <CodeGroupItem title="YARN" active>
+斐波那契递归版
 
-```bash
-# 在你的项目中安装
-yarn add -D vuepress@next
-# 新建一个 markdown 文件
-echo '# Hello VuePress' > README.md
-# 开始写作
-yarn vuepress dev
-# 构建静态文件
-yarn vuepress build
+```scheme
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+(fib 3)
 ```
 
-  </CodeGroupItem>
+<div>
+    <button @click="runBase('1')">运行</button>
+    <button @click="runSub('1')">代换</button>
+    <button @click="clear('1')">清除</button>
+</div>
+<pre> {{msg[1]}} </pre>
 
-  <CodeGroupItem title="NPM">
 
-```bash
-# 在你的项目中安装
-npm install -D vuepress@next
-# 新建一个 markdown 文件
-echo '# Hello VuePress' > README.md
-# 开始写作
-npx vuepress dev
-# 构建静态文件
-npx vuepress build
+斐波那契迭代版
+
+```scheme
+(define (fib-iter a b count)
+        (if (= count 0)
+            b
+            (fib-iter (+ a b) a (- count 1))))
+
+(define (fib2 n)
+    (fib-iter 1 0 n))
+
+(fib2 3)
 ```
 
-  </CodeGroupItem>
-</CodeGroup>
+<div>
+    <button @click="runBase('2')">运行</button>
+    <button @click="runSub('2')">代换</button>
+    <button @click="clear('2')">清除</button>
+</div>
+<pre> {{msg[2]}} </pre>
+
+
+
+
+<script>
+import { run } from "@/ts/main";
+import { baseEnv } from "@/ts/core/apply";
+
+export default {
+  data() {
+    return {
+      msg: {
+        1:``,2:``,
+      },
+      env: baseEnv(),
+      codes: {
+        1:`
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+(fib 3)
+`,2:`
+(define (fib-iter a b count)
+        (if (= count 0)
+            b
+            (fib-iter (+ a b) a (- count 1))))
+
+(define (fib2 n)
+    (fib-iter 1 0 n))
+
+(fib2 3)
+`,
+      },
+    };
+  },
+  created() {},
+  methods: {
+    runBase(name) {
+      this.clear(name);
+      let str = this.codes[name];
+      let display = (str) => {
+        this.msg[name] = this.msg[name] + str;
+      };
+      run(str,display,false,this.env)
+    },
+    runSub(name) {
+      this.clear(name);
+      let str = this.codes[name];
+      let display = (str) => {
+        this.msg[name] = this.msg[name] + str;
+      };
+      run(str,display,true,this.env)
+    },
+    clear(name) {
+      this.msg[name] = "";
+    },
+  },
+};
+</script>
